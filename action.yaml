@@ -10,6 +10,9 @@ inputs:
   docs-repo:
     description: 'Docs repository'
     required: true
+  base-branch:
+    description: 'branch to create PR against'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -48,6 +51,7 @@ runs:
         branch: new-release-notes/preview
         title: '[Auto PR] Generated release notes'
         delete-branch: true
+        base: ${{inputs.base-branch}}
     - name: automatic merge
       env:
         GH_TOKEN: ${{inputs.token}}
