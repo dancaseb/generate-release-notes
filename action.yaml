@@ -38,6 +38,11 @@ runs:
     - name: run script
       run: |
         pip install GitPython
+        # add condition if release notes file doesnt exists
+        if [ ! -f ${{inputs.docs-repo}}/release-notes.md ]; then
+          echo "release-notes.md file does not exist. Creating empty file now..."
+          touch ${{inputs.docs-repo}}/release-notes.md
+        fi
         cp ${{inputs.docs-repo}}/release-notes.md ${{inputs.source-repo}}/release-notes.md
         cp create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
         cd ${{inputs.source-repo}}

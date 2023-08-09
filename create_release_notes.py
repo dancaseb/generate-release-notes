@@ -56,26 +56,35 @@ class ReleaseNoteGenerator:
             content = file.readlines()
         return content
 
-    def write_file(self, path, content, parsed_diff):
+    def write_file(self, path, file_content, parsed_diff):
+        # iterates file content and when finds delimeter_pattern, writes the release note and then continues writing the rest of the file
         delimeter_pattern = r'^\<\!\-\-Release note v[0-9]+\.[0-9]+\.[0-9]+\!\-\-\>$'
         with (open(path, 'w')) as file:
-            found_delimiter = False
-            for line in content:
-                if not found_delimiter and re.match(delimeter_pattern, line):
-                    file.write(
-                        f"<!--Release note v{parsed_diff['release_version']}!-->\n")
-                    file.write(f"## {parsed_diff['release_headline']}\n\n")
-                    for change in parsed_diff['changes']:
-                        file.write(f"{change['change_headline']}\n\n")
-                        file.write(f"{change['change_description']}\n\n")
-                    file.write(line)
-                    found_delimiter = True
-                else:
-                    file.write(line)
+            if not file_content:
+                # file is empty, write release note at the top
+                file.write(f"# Changelog\n\n")
+                self._write_release_notes(file, parsed_diff)
+            else:
+                found_delimiter = False
+                for line in file_content:
+                    if not found_delimiter and re.match(delimeter_pattern, line):
+                        self._write_release_notes(file, parsed_diff)
+                        file.write(line)
+                        found_delimiter = True
+                    else:
+                        file.write(line)
+
+    def _write_release_notes(self, file, parsed_diff):
+        file.write(
+            f"<!--Release note v{parsed_diff['release_version']}!-->\n")
+        file.write(f"## {parsed_diff['release_headline']}\n\n")
+        for change in parsed_diff['changes']:
+            file.write(f"{change['change_headline']}\n\n")
+            file.write(f"{change['change_description']}\n\n")
 
     def generate_release_note(self):
         parsed_diff = self.parse_diff(self.diff)
-        print(parsed_diff)
+        # print(parsed_diff)
         content = self.load_file('release-notes.md')
         self.write_file('release-notes.md', content, parsed_diff)
 
