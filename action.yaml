@@ -55,10 +55,10 @@ runs:
         title: '[Auto PR] Generated release notes'
         delete-branch: true
         base: ${{inputs.base-branch}}
-    - name: automatic merge
-      if: ${{inputs.allow-automerge == 'true'}}
-      env:
-        GH_TOKEN: ${{inputs.token}}
-      run: |
-        gh pr merge new-release-notes/preview --auto --delete-branch --rebase --repo ${{inputs.docs-repo}}
-      shell: bash
+    # - name: automatic merge
+    #   if: ${{inputs.allow-automerge == 'true'}}
+    #   env:
+    #     GH_TOKEN: ${{inputs.token}}
+    #   run: |
+    #     gh pr merge new-release-notes/preview --auto --delete-branch --rebase --repo ${{inputs.docs-repo}}
+    #   shell: bash
