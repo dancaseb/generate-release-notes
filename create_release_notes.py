@@ -60,8 +60,10 @@ class ReleaseNoteGenerator:
         # iterates file content and when finds delimeter_pattern, writes the release note and then continues writing the rest of the file
         delimeter_pattern = r'^\<\!\-\-Release note v[0-9]+\.[0-9]+\.[0-9]+\!\-\-\>$'
         with (open(path, 'w')) as file:
+            print(file_content)
             if not file_content:
                 # file is empty, write release note at the top
+                print('file is empty, writing release note at the top')
                 file.write(f"# Changelog\n\n")
                 self._write_release_notes(file, parsed_diff)
             else:
