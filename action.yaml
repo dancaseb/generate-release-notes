@@ -28,7 +28,7 @@ runs:
       uses: actions/checkout@v3
       with:
         path: ${{inputs.docs-repo}}
-        ref: master
+        ref: ${{inputs.base-branch}}
         token: ${{inputs.token}}
         repository: ${{inputs.docs-repo}}
     - name: Set up Python
@@ -56,7 +56,7 @@ runs:
         delete-branch: true
         base: ${{inputs.base-branch}}
     - name: automatic merge
-      if: ${{inputs.allow-automerge  == true}}
+      if: ${{inputs.allow-automerge == true}}
       env:
         GH_TOKEN: ${{inputs.token}}
       run: |
