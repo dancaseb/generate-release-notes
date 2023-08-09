@@ -13,6 +13,9 @@ inputs:
   base-branch:
     description: 'branch to create PR against'
     required: true
+  allow-automerge:
+    type: boolean
+    default: false
 runs:
   using: "composite"
   steps:
@@ -53,6 +56,7 @@ runs:
         delete-branch: true
         base: ${{inputs.base-branch}}
     - name: automatic merge
+      if: ${{inputs.allow-automerge}} == true
       env:
         GH_TOKEN: ${{inputs.token}}
       run: |
