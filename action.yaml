@@ -37,6 +37,7 @@ runs:
         cd ${{inputs.source-repo}}
         python create_release_notes.py
         cp release-notes.md ../${{inputs.docs-repo}}/release-notes.md
+      shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5
       with:
@@ -51,3 +52,4 @@ runs:
         GH_TOKEN: ${{inputs.token}}
       run: |
         gh pr merge new-release-notes/preview --auto --delete-branch --rebase --repo ${{inputs.docs-repo}}
+      shell: bash
