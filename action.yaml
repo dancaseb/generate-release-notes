@@ -36,8 +36,8 @@ runs:
         cp create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
         cd ${{inputs.source-repo}}
         python create_release_notes.py
-        ls
-        cp release-notes.md ../${{inputs.docs-repo}}/release-notes.md
+        cd ..
+        cp ${{inputs.source-repo}}/release-notes.md ${{inputs.docs-repo}}/release-notes.md
         echo "copied release notes to docs"
       shell: bash
     - name: create PR
