@@ -1,0 +1,47 @@
+name: Generate release notes
+description: action to generate release notes
+inputs:
+  token:  
+    description: 'Github token'
+    required: true
+  source-repo:
+    description: 'Source repository'
+    required: true
+  docs-repo:
+    description: 'Docs repository'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    uses: actions/checkout@v3
+    with:
+      path: ${{inputs.source-repo}}
+      fetch-depth: 0
+    uses: actions/checkout@v3
+    with:
+      path: ${{inputs.docs-repo}}
+      ref: master
+      token: ${{inputs.token}}
+      repository: ${{inputs.docs-repo}}
+    uses: actions/setup-python@v4
+    with:
+      python-version: '3.10' # install the python version needed
+    run: |
+      pip install GitPython
+      cp ${{inputs.docs-repo}}/release-notes.md ${{inputs.source-repo}}/release-notes.md
+      cp create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
+      cd ${{inputs.source-repo}}
+      python create_release_notes.py
+      cp release-notes.md ../${{inputs.docs-repo}}/release-notes.md     
+    uses: peter-evans/create-pull-request@v5
+    with:
+      token: ${{inputs.token}}
+      path: ${{inputs.docs-repo}}
+      commit-message: 'generated release note'
+      branch: new-release-notes/preview
+      title: '[Auto PR] Generated release notes'
+      delete-branch: true
+    env:
+      GH_TOKEN: ${{inputs.token}}
+    run: |
+      gh pr merge new-release-notes/preview --auto --delete-branch --rebase --repo ${{inputs.docs-repo}}
