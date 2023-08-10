@@ -49,17 +49,18 @@ runs:
           echo "release-notes file does not exist. Creating empty file now..."
           touch ${{inputs.docs-repo}}/${{inputs.release-notes-path}}
         fi
-        echo "copying release notes file to source repo and running script"
+        # echo "copying release notes file to source repo and running script"
         # copy release notes file and create_release_notes.py to source repo and run it
-        cp ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ${{github.repository}}/release-notes-tmp.md
-        cp ${{ github.action_path }}/create_release_notes.py ${{github.repository}}/create_release_notes.py
-        cd ${{github.repository}}
+        # cp ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ${{github.repository}}/release-notes-tmp.md
+        # cp ${{ github.action_path }}/create_release_notes.py ${{github.repository}}/create_release_notes.py
+        # cd ${{github.repository}}
         # check if python script ran successfully
-        python create_release_notes.py --source ${{github.repository}}
+        echo "${{github.repository}}; ${{github.workspace}}; ${{inputs.docs-repo}}; ${{inputs.release-notes-path}}"
+        python ${{github.action_path}}/create_release_notes.py --source_path ${{github.workspace}}/${{github.repository}} --release_notes_path ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
         # copy release notes file back to docs repo
-        echo "copying release notes file back to docs repo and creating PR"
-        cp release-notes-tmp.md ../../${{inputs.docs-repo}}/${{inputs.release-notes-path}}
-        echo "github.repository: ${{github.repository}}"
+        # echo "copying release notes file back to docs repo and creating PR"
+        # cp release-notes-tmp.md ../../${{inputs.docs-repo}}/${{inputs.release-notes-path}}
+        # echo "github.repository: ${{github.repository}}"
       shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5

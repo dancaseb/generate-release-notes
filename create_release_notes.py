@@ -4,8 +4,9 @@ import argparse
 
 
 class GitRepo:
-    def __init__(self) -> None:
-        self.repo = git.Repo()
+    def __init__(self, path) -> None:
+        # path to the git repo
+        self.repo = git.Repo(path)
 
     def get_changelog_diff(self):
         diff = self.repo.git.diff(
@@ -18,7 +19,7 @@ class GitRepo:
 
 class ReleaseNoteGenerator:
 
-    def parse_diff(self, diff, source_repo):
+    def parse_diff(self, diff, source_path):
 
         # match lines that start with a + and then a # or *. Plus sign is from the diff
         extract_changes_pattern = r'^\+([#*].*)'
@@ -28,6 +29,7 @@ class ReleaseNoteGenerator:
         commit_pattern = r'https:\/\/.*\/commit\/([0-9a-z]*)'
         # extract date from release url
 
+        source_repo = source_path.split('/')[-2] + '/' + source_path.split('/')[-1]
         changelog_lines = re.findall(extract_changes_pattern, diff, re.M)
         parsed_content = {'compare_changes_url': None, 'release_date': None,
                           'release_version': None, 'source_repo': source_repo, 'source_repo_url': f"https://github.com/{source_repo}", 'changes': []}
@@ -51,6 +53,7 @@ class ReleaseNoteGenerator:
         return parsed_content
 
     def load_file(self, path):
+        print(path)
         with open(path, 'r') as file:
             content = file.readlines()
         return content
@@ -81,15 +84,15 @@ class ReleaseNoteGenerator:
         file.write(
             f"<!--Release note v{parsed_diff['release_version']}!-->\n")
         file.write(
-            f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[1]}]({parsed_diff['source_repo_url']})\n")
+            f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[-1]}]({parsed_diff['source_repo_url']})\n")
         file.write(f"* #### {parsed_diff['compare_changes_url']}\n\n")
         for change in parsed_diff['changes']:
             file.write(f"{change['change_headline']}\n\n")
             file.write(f"{change['change_description']}\n\n")
         file.write("***\n")
 
-    def generate_release_note(self, changelog_diff, source_repo, filename):
-        parsed_diff = self.parse_diff(changelog_diff, source_repo)
+    def generate_release_note(self, changelog_diff, source_path, filename):
+        parsed_diff = self.parse_diff(changelog_diff, source_path)
         print(parsed_diff)
         content = self.load_file(filename)
         self.write_file(filename, content, parsed_diff)
@@ -98,13 +101,12 @@ class ReleaseNoteGenerator:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
     parser.add_argument(
-        '--source', type=str, help='Source repository to generate release notes from. Owner/repo format', required=True)
-    parser.add_argument('--filename', type=str, help='File name to write release notes to. Default is release-notes-tmp.md',
-                        default='release-notes-tmp.md')
+        '--source_path', type=str, help='Source repository to generate release notes from.', required=True)
+    parser.add_argument('--release_notes_path', type=str, help='File name to write release notes to.')
     args = parser.parse_args()
 
-    Repo = GitRepo()
+    Repo = GitRepo(args.source_path)
     changelog_diff = Repo.get_changelog_diff()
 
     ReleaseNote = ReleaseNoteGenerator()
-    ReleaseNote.generate_release_note(changelog_diff, args.source, args.filename)
+    ReleaseNote.generate_release_note(changelog_diff, args.source_path, args.release_notes_path)
