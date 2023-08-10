@@ -41,7 +41,7 @@ runs:
     - name: run script
       run: |
         pip install GitPython
-        # add condition if release notes file doesnt exists
+        # create file if it does not exist. Parent folder must exist!
         if [ ! -f ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ]; then
           echo "release-notes file does not exist. Creating empty file now..."
           touch ${{inputs.docs-repo}}/${{inputs.release-notes-path}}
