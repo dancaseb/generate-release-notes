@@ -4,9 +4,10 @@ inputs:
   token:  
     description: 'Github token'
     required: true
-  source-repo:
-    description: 'Source repository'
-    required: true
+    # try making source repo a variable
+  # source-repo:
+  #   description: 'Source repository'
+  #   required: true
   docs-repo:
     description: 'Docs repository'
     required: true
@@ -25,7 +26,7 @@ runs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        path: ${{inputs.source-repo}}
+        path: ${{github.repository}}
         fetch-depth: 0
     - name: Checkout
       uses: actions/checkout@v3
@@ -48,14 +49,15 @@ runs:
         fi
         echo "copying release notes file to source repo and running script"
         # copy release notes file and create_release_notes.py to source repo and run it
-        cp ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ${{inputs.source-repo}}/${{inputs.release-notes-path}}
-        cp ${{ github.action_path }}/create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
-        cd ${{inputs.source-repo}}
+        cp ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ${{github.repository}}/${{inputs.release-notes-path}}
+        cp ${{ github.action_path }}/create_release_notes.py ${{github.repository}}/create_release_notes.py
+        cd ${{github.repository}}
         # check if python script ran successfully
         python create_release_notes.py
         # copy release notes file back to docs repo
         echo "copying release notes file back to docs repo and creating PR"
         cp ${{inputs.release-notes-path}} ../../${{inputs.docs-repo}}
+        echo "github.repository: ${{github.repository}}"
       shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5
