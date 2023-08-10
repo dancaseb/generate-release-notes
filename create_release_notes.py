@@ -80,28 +80,31 @@ class ReleaseNoteGenerator:
     def _write_release_notes(self, file, parsed_diff):
         file.write(
             f"<!--Release note v{parsed_diff['release_version']}!-->\n")
-        file.write(f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[1]}]({parsed_diff['source_repo_url']})\n")
+        file.write(
+            f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[1]}]({parsed_diff['source_repo_url']})\n")
         file.write(f"* #### {parsed_diff['compare_changes_url']}\n\n")
         for change in parsed_diff['changes']:
             file.write(f"{change['change_headline']}\n\n")
             file.write(f"{change['change_description']}\n\n")
         file.write("***\n")
 
-    def generate_release_note(self, changelog_diff, source_repo):
+    def generate_release_note(self, changelog_diff, source_repo, filename):
         parsed_diff = self.parse_diff(changelog_diff, source_repo)
         print(parsed_diff)
-        content = self.load_file('release-notes.md')
-        self.write_file('release-notes.md', content, parsed_diff)
+        content = self.load_file(filename)
+        self.write_file(filename, content, parsed_diff)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
     parser.add_argument(
         '--source', type=str, help='Source repository to generate release notes from. Owner/repo format', required=True)
+    parser.add_argument('--filename', type=str, help='File name to write release notes to. Default is release-notes.md',
+                        default='release-notes.md')
     args = parser.parse_args()
 
     Repo = GitRepo()
     changelog_diff = Repo.get_changelog_diff()
 
     ReleaseNote = ReleaseNoteGenerator()
-    ReleaseNote.generate_release_note(changelog_diff, args.source)
+    ReleaseNote.generate_release_note(changelog_diff, args.source, args.filename)
