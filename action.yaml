@@ -16,6 +16,9 @@ inputs:
   allow-automerge:
     type: boolean
     default: false
+  release-notes-path:
+    description: 'path to release notes file (including file name)'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -39,20 +42,20 @@ runs:
       run: |
         pip install GitPython
         # add condition if release notes file doesnt exists
-        if [ ! -f ${{inputs.docs-repo}}/release-notes.md ]; then
-          echo "release-notes.md file does not exist. Creating empty file now..."
-          touch ${{inputs.docs-repo}}/release-notes.md
+        if [ ! -f ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ]; then
+          echo "release-notes file does not exist. Creating empty file now..."
+          touch ${{inputs.docs-repo}}/${{inputs.release-notes-path}}
         fi
         echo "copying release notes file to source repo and running script"
         # copy release notes file and create_release_notes.py to source repo and run it
-        cp ${{inputs.docs-repo}}/release-notes.md ${{inputs.source-repo}}/release-notes.md
+        cp ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ${{inputs.source-repo}}/${{inputs.release-notes-path}}
         cp ${{ github.action_path }}/create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
         cd ${{inputs.source-repo}}
         # check if python script ran successfully
         python create_release_notes.py
         # copy release notes file back to docs repo
         echo "copying release notes file back to docs repo and creating PR"
-        cp release-notes.md ../../${{inputs.docs-repo}}
+        cp ${{inputs.release-notes-path}} ../../${{inputs.docs-repo}}
       shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5
