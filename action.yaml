@@ -1,33 +1,34 @@
 name: 'Generate release notes'
-description: 'action to generate release notes'
+description: 'Action used to generate release notes and create PR in the docs repo'
 inputs:
   token:  
-    description: 'Github token'
-    required: true
-    # try making source repo a variable
-  # source-repo:
-  #   description: 'Source repository'
-  #   required: true
+    description: 'github token'
+    default: ${{ github.token }}
   docs-repo:
-    description: 'Docs repository'
+    description: 'docs repository (in format owner/repo)'
     required: true
   base-branch:
     description: 'branch to create PR against'
     required: true
+    # in the future, master will be default value
   allow-automerge:
+    description: 'allow automatic merge of PR'
     type: boolean
     default: false
   release-notes-path:
     description: 'path to release notes file (including file name)'
-    required: true
+    default: releases/release-notes.md
 runs:
   using: "composite"
   steps:
+    - name: Validate required inputs
+      run: |
+        [[ "${{ inputs.docs-repo }}" ]] || { echo "docs-repo input is empty" ; exit 1; }
     - name: Checkout
       uses: actions/checkout@v3
       with:
         path: ${{github.repository}}
-        fetch-depth: 0
+        fetch-depth: 2
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -38,7 +39,7 @@ runs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10' # install the python version needed
+        python-version: '3.10'
     - name: run script
       run: |
         pip install GitPython
