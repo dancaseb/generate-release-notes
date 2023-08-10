@@ -53,7 +53,7 @@ runs:
         cp ${{ github.action_path }}/create_release_notes.py ${{github.repository}}/create_release_notes.py
         cd ${{github.repository}}
         # check if python script ran successfully
-        python create_release_notes.py
+        python create_release_notes.py --source ${{github.repository}}
         # copy release notes file back to docs repo
         echo "copying release notes file back to docs repo and creating PR"
         cp ${{inputs.release-notes-path}} ../../${{inputs.docs-repo}}
