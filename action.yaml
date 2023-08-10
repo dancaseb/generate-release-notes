@@ -43,14 +43,16 @@ runs:
           echo "release-notes.md file does not exist. Creating empty file now..."
           touch ${{inputs.docs-repo}}/release-notes.md
         fi
+        echo "copying release notes file to source repo and running script"
+        # copy release notes file and create_release_notes.py to source repo and run it
         cp ${{inputs.docs-repo}}/release-notes.md ${{inputs.source-repo}}/release-notes.md
-        # cp create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
-        # cd ${{inputs.source-repo}}
         cp ${{ github.action_path }}/create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
         cd ${{inputs.source-repo}}
+        # check if python script ran successfully
         python create_release_notes.py
+        # copy release notes file back to docs repo
+        echo "copying release notes file back to docs repo and creating PR"
         cp release-notes.md ../../${{inputs.docs-repo}}
-        echo "copied release notes to docs"
       shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5
