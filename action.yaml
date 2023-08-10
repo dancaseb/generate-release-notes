@@ -56,7 +56,7 @@ runs:
         python create_release_notes.py --source ${{github.repository}}
         # copy release notes file back to docs repo
         echo "copying release notes file back to docs repo and creating PR"
-        cp release-notes-tmp.md ../../${{inputs.docs-repo}}
+        cp release-notes-tmp.md ../../${{inputs.docs-repo}}/${{inputs.release-notes-path}}
         echo "github.repository: ${{github.repository}}"
       shell: bash
     - name: create PR
