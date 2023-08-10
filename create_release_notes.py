@@ -67,6 +67,7 @@ class ReleaseNoteGenerator:
                 file.write(f"# Changelog\n\n")
                 self._write_release_notes(file, parsed_diff)
             else:
+                print('appending release note to existing file')
                 found_delimiter = False
                 for line in file_content:
                     if not found_delimiter and re.match(delimeter_pattern, line):
