@@ -4,9 +4,8 @@ import argparse
 
 
 class GitRepo:
-    def __init__(self, path) -> None:
-        # path to the git repo
-        self.repo = git.Repo(path)
+    def __init__(self) -> None:
+        self.repo = git.Repo()
 
     def get_changelog_diff(self):
         diff = self.repo.git.diff(
@@ -52,7 +51,6 @@ class ReleaseNoteGenerator:
         return parsed_content
 
     def load_file(self, path):
-        print(path)
         with open(path, 'r') as file:
             content = file.readlines()
         return content
@@ -82,8 +80,8 @@ class ReleaseNoteGenerator:
     def _write_release_notes(self, file, parsed_diff):
         file.write(
             f"<!--Release note v{parsed_diff['release_version']}!-->\n")
-        # file.write(
-        #     f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[1]}]({parsed_diff['source_repo_url']})\n")
+        file.write(
+            f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[1]}]({parsed_diff['source_repo_url']})\n")
         file.write(f"* #### {parsed_diff['compare_changes_url']}\n\n")
         for change in parsed_diff['changes']:
             file.write(f"{change['change_headline']}\n\n")
@@ -100,14 +98,13 @@ class ReleaseNoteGenerator:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
     parser.add_argument(
-        '--source', type=str, help='Source repository to generate release notes from. owner/repo', required=True)
-    parser.add_argument(
-        '--source_path', type=str, help='Source repository to generate release notes from.', required=True)
-    parser.add_argument('--release_notes_path', type=str, help='File name to write release notes to.')
+        '--source', type=str, help='Source repository to generate release notes from. Owner/repo format', required=True)
+    parser.add_argument('--filename', type=str, help='File name to write release notes to. Default is release-notes-tmp.md',
+                        default='release-notes-tmp.md')
     args = parser.parse_args()
 
-    Repo = GitRepo(args.source_path)
+    Repo = GitRepo()
     changelog_diff = Repo.get_changelog_diff()
 
     ReleaseNote = ReleaseNoteGenerator()
-    ReleaseNote.generate_release_note(changelog_diff, args.source, args.release_notes_path)
+    ReleaseNote.generate_release_note(changelog_diff, args.source, args.filename)
