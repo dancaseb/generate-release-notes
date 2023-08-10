@@ -44,8 +44,9 @@ runs:
           touch ${{inputs.docs-repo}}/release-notes.md
         fi
         cp ${{inputs.docs-repo}}/release-notes.md ${{inputs.source-repo}}/release-notes.md
-        cp create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
-        cd ${{inputs.source-repo}}
+        # cp create_release_notes.py ${{inputs.source-repo}}/create_release_notes.py
+        # cd ${{inputs.source-repo}}
+        ls
         python create_release_notes.py
         cp release-notes.md ../../${{inputs.docs-repo}}
         echo "copied release notes to docs"
