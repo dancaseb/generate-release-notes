@@ -99,8 +99,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
     parser.add_argument(
         '--source', type=str, help='Source repository to generate release notes from. Owner/repo format', required=True)
-    parser.add_argument('--filename', type=str, help='File name to write release notes to. Default is release-notes.md',
-                        default='release-notes.md')
+    parser.add_argument('--filename', type=str, help='File name to write release notes to. Default is release-notes-tmp.md',
+                        default='release-notes-tmp.md')
     args = parser.parse_args()
 
     Repo = GitRepo()
