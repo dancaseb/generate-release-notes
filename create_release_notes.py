@@ -1,5 +1,6 @@
 import git
 import re
+import os
 import argparse
 from regex_patterns import extract_changes_pattern, headline_pattern, commit_pattern, delimeter_pattern
 
@@ -21,10 +22,10 @@ class GitRepo:
 class ReleaseNoteGenerator:
 
     def _parse_diff(self, diff, source_path):
-        source_repo = source_path.split(
-            '/')[-2] + '/' + source_path.split('/')[-1]
+        source_repo = source_path.split('/')[-1]
+        source_owner = source_path.split('/')[-2]
         parsed_diff = {'compare_changes_url': None, 'release_date': None,
-                          'release_version': None, 'source_repo': source_repo, 'source_repo_url': f"https://github.com/{source_repo}", 'changes': []}
+                          'release_version': None, 'source_repo': source_repo, 'source_repo_url': f"https://github.com/{source_owner}/{source_repo}", 'changes': []}
 
         changelog_lines = re.findall(extract_changes_pattern, diff, re.M)
         for line in changelog_lines:
@@ -45,6 +46,8 @@ class ReleaseNoteGenerator:
                     commit_pattern, line).group(1)
 
         self._verify_parsed_diff(parsed_diff)
+        # output REPO name and RELEASE version as env to be used in workflow
+        self._output_env_variable('REPO_RELEASE', f"{parsed_diff['source_repo']} {parsed_diff['release_version']}")
         return parsed_diff
 
     def _load_file(self, path):
@@ -75,7 +78,7 @@ class ReleaseNoteGenerator:
         file.write(
             f"<!--Release note v{parsed_diff['release_version']}!-->\n")
         file.write(
-            f"### {parsed_diff['release_date']} [{parsed_diff['source_repo'].split('/')[-1]}]({parsed_diff['source_repo_url']})\n")
+            f"### {parsed_diff['release_date']} [{parsed_diff['source_repo']}]({parsed_diff['source_repo_url']})\n")
         file.write(f"* #### {parsed_diff['compare_changes_url']}\n\n")
         for change in parsed_diff['changes']:
             file.write(f"{change['change_headline']}\n\n")
@@ -87,6 +90,10 @@ class ReleaseNoteGenerator:
             if value is None:
                 raise ValueError(
                     f"Parsing diff failed. All values must be filled in. Value for key {key} is {value}.")
+    
+    def _output_env_variable(self, name, value):
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as output_file:
+            print(f'{name}={value}', file=output_file)
 
     def generate_release_note(self, changelog_diff, source_repo_path, release_notes_path):
         parsed_diff = self._parse_diff(changelog_diff, source_repo_path)

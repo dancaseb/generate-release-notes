@@ -58,7 +58,7 @@ runs:
       with:
         token: ${{inputs.token}}
         path: ${{inputs.docs-repo}}
-        commit-message: 'generated release note'
+        commit-message: 'release note ${{ steps.generate-release-notes.outputs.REPO_RELEASE }}'
         branch: new-release-notes/preview
         title: '[Auto PR] Generated release notes'
         delete-branch: true
