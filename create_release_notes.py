@@ -38,7 +38,7 @@ class ReleaseNoteGenerator:
                     headline_pattern, line).group(3)
             # e.g., ### Bug Fixes
             elif line.startswith('###'):
-                parsed_diff['changes'].append({'change_headline': line})
+                parsed_diff['changes'].append({'change_headline': line.replace('### ', '', 1)})
             # commit messages
             elif line.startswith('*'):
                 parsed_diff['changes'][-1]['change_description'] = line
@@ -81,9 +81,9 @@ class ReleaseNoteGenerator:
             f"### {parsed_diff['release_date']} [{parsed_diff['source_repo']}]({parsed_diff['source_repo_url']})\n")
         file.write(f"* #### {parsed_diff['compare_changes_url']}\n\n")
         for change in parsed_diff['changes']:
-            file.write(f"{change['change_headline']}\n\n")
+            file.write(f"#### {change['change_headline']}\n\n")
             file.write(f"{change['change_description']}\n\n")
-        file.write("***\n")
+        file.write("***\n\n")
 
     def _verify_parsed_diff(self, parsed_diff):
         for key, value in parsed_diff.items():
