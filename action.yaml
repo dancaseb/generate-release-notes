@@ -41,7 +41,8 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - name: run script
+    - name: generate release notes
+      id: generate-release-notes
       run: |
         pip install GitPython
         # create file if it does not exist. Parent folder must exist!
@@ -49,18 +50,8 @@ runs:
           echo "release-notes file does not exist. Creating empty file now..."
           touch ${{inputs.docs-repo}}/${{inputs.release-notes-path}}
         fi
-        # echo "copying release notes file to source repo and running script"
-        # copy release notes file and create_release_notes.py to source repo and run it
-        # cp ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ${{github.repository}}/release-notes-tmp.md
-        # cp ${{ github.action_path }}/create_release_notes.py ${{github.repository}}/create_release_notes.py
-        # cd ${{github.repository}}
-        # check if python script ran successfully
-        echo "${{github.repository}}; ${{github.workspace}}; ${{inputs.docs-repo}}; ${{inputs.release-notes-path}}"
+        # run script to generate release notes
         python ${{github.action_path}}/create_release_notes.py --source_path ${{github.workspace}}/${{github.repository}} --release_notes_path ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
-        # copy release notes file back to docs repo
-        # echo "copying release notes file back to docs repo and creating PR"
-        # cp release-notes-tmp.md ../../${{inputs.docs-repo}}/${{inputs.release-notes-path}}
-        # echo "github.repository: ${{github.repository}}"
       shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5
@@ -72,6 +63,7 @@ runs:
         title: '[Auto PR] Generated release notes'
         delete-branch: true
         base: ${{inputs.base-branch}}
+    # Temporarily disabled for testing
     # - name: automatic merge
     #   if: ${{inputs.allow-automerge == 'true'}}
     #   env:
