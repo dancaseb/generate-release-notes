@@ -40,6 +40,7 @@ class ReleaseNoteGenerator:
             elif line.startswith('###'):
                 parsed_diff['changes'].append({'change_headline': line.replace('### ', '', 1)})
             # commit messages
+            # HERE IS A PROBLEM, the commit message will be rewritten, if change headline is the same... Needs to be fixed
             elif line.startswith('*'):
                 parsed_diff['changes'][-1]['change_description'] = line
                 parsed_diff['changes'][-1]['commit_hash'] = re.search(
