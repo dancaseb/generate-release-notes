@@ -123,7 +123,7 @@ class ReleaseNoteGenerator:
             release_notes_path, file_content, parsed_diff)
 
     def open_env(self):
-        print(os.environ['REPO_URL'])
+        print(f"repo url {os.environ['REPO_URL']}")
 
 
 if __name__ == "__main__":
