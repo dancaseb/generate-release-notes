@@ -50,7 +50,9 @@ runs:
           touch ${{inputs.docs-repo}}/${{inputs.release-notes-path}}
         fi
         # run script to generate release notes
-        python ${{github.action_path}}/create_release_notes.py --source_repo_path ${{github.workspace}}/${{github.repository}} --release_notes_path ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
+        python ${{github.action_path}}/create_release_notes.py \
+        --source_repo_path ${{github.workspace}}/${{github.repository}} \
+        --release_notes_path ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
       shell: bash
     - name: create PR
       uses: peter-evans/create-pull-request@v5

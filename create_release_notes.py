@@ -10,32 +10,44 @@ class GitRepo:
         # path to the git repo
         self.repo = git.Repo(path)
 
-    def get_changelog_diff(self):
+    def _get_changelog_diff(self):
         diff = self.repo.git.diff(
             "--unified=0", "HEAD^", "HEAD", "--", "CHANGELOG.md")
         if not diff:
             raise Exception(
-                "git diff --unified=0 HEAD^ HEAD -- CHANGELOG.md returned empty string. There is nothing to generate the release note from!")
+                "git diff --unified=0 HEAD^ HEAD -- CHANGELOG.md returned empty string. \
+                    There is nothing to generate the release note from!")
         return diff
+
+    def _get_repo_url(self):
+        return self.repo.git.ls_remote("--get-url")
+
+    def _get_latest_tag(self):
+        version = self.repo.git.for_each_ref(
+            "--sort=-v:refname", "--format=%(refname:short)", "--count=1", "refs/tags/v*")
+        date = self.repo.git.for_each_ref(
+            "--sort=-v:refname", "--format=%(authordate:short)", "--count=1", "refs/tags/v*")
+        return {'version': version, 'date': date}
+
+    def get_repo_details(self):
+        return {'changelog_diff': self._get_changelog_diff(), 'url': self._get_repo_url(),
+                'latest_tag': self._get_latest_tag(),
+                'name': self.repo.remotes.origin.url.split('/')[-1].removesuffix('.git')}
 
 
 class ReleaseNoteGenerator:
 
-    def _parse_diff(self, diff, source_path):
-        source_repo = source_path.split('/')[-1]
-        source_owner = source_path.split('/')[-2]
-        parsed_diff = {'compare_changes_url': None, 'release_date': None,
-                       'release_version': None, 'source_repo': source_repo, 'source_repo_url': f"https://github.com/{source_owner}/{source_repo}", 'changes': []}
+    def _parse_diff(self, repo):
+        parsed_diff = {'compare_changes_url': None, 'release_date': repo['latest_tag']['date'],
+                       'release_version': repo['latest_tag']['version'], 'source_repo': repo['name'],
+                       'source_repo_url': repo['url'], 'changes': []}
 
-        changelog_lines = re.findall(extract_changes_pattern, diff, re.M)
+        changelog_lines = re.findall(
+            extract_changes_pattern, repo['changelog_diff'], re.M)
         for line in changelog_lines:
             if re.match(version_headline_pattern, line):
                 parsed_diff['compare_changes_url'] = re.search(
                     version_headline_pattern, line).group(1)
-                parsed_diff['release_version'] = re.search(
-                    version_headline_pattern, line).group(2)
-                parsed_diff['release_date'] = re.search(
-                    version_headline_pattern, line).group(3)
             # e.g., ### Bug Fixes
             elif line.startswith(change_headline_start):
                 parsed_diff['changes'].append(
@@ -60,7 +72,8 @@ class ReleaseNoteGenerator:
         with (open(path, 'w')) as file:
             if not file_content:
                 # file is empty, write release note at the top
-                self._write_release_note(file, parsed_diff, include_headline=True)
+                self._write_release_note(
+                    file, parsed_diff, include_headline=True)
             else:
                 found_delimiter = False
                 for line in file_content:
@@ -72,14 +85,14 @@ class ReleaseNoteGenerator:
                         file.write(line)
                 if not found_delimiter:
                     # delimeter_pattern not found in the file and file not empty, append release note
-                    self._write_release_note(file, parsed_diff, include_headline=True)
+                    self._write_release_note(
+                        file, parsed_diff, include_headline=True)
 
     def _write_release_note(self, file, parsed_diff, include_headline=False):
         if include_headline:
             file.write(f"{file_headline}\n\n")
             file.write(f"{section_delimeter}\n")
-        file.write(
-            f"<!--Release note v{parsed_diff['release_version']}!-->\n")
+        file.write(f"<!--Release note {parsed_diff['release_version']}!-->\n")
         file.write(
             f"### {parsed_diff['release_date']} [{parsed_diff['source_repo']}]({parsed_diff['source_repo_url']})\n")
         file.write(f"* #### {parsed_diff['compare_changes_url']}\n\n")
@@ -99,14 +112,15 @@ class ReleaseNoteGenerator:
         with open(os.environ['GITHUB_OUTPUT'], 'a') as output_file:
             print(f'{name}={value}', file=output_file)
 
-    def generate(self, changelog_diff, source_repo_path, release_notes_path):
-        parsed_diff = self._parse_diff(changelog_diff, source_repo_path)
+    def generate(self, repo_details, release_notes_path):
+        parsed_diff = self._parse_diff(repo_details)
         self._verify_parsed_diff(parsed_diff)
         # output REPO name and RELEASE version as env to be used later in workflow
         self._output_env_variable(
             'REPO_RELEASE', f"{parsed_diff['source_repo']} {parsed_diff['release_version']}")
         file_content = self._load_file(release_notes_path)
-        self._prepend_release_note(release_notes_path, file_content, parsed_diff)
+        self._prepend_release_note(
+            release_notes_path, file_content, parsed_diff)
 
 
 if __name__ == "__main__":
@@ -118,8 +132,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     Repo = GitRepo(args.source_repo_path)
-    changelog_diff = Repo.get_changelog_diff()
+    repo_details = Repo.get_repo_details()
 
     ReleaseNote = ReleaseNoteGenerator()
     ReleaseNote.generate(
-        changelog_diff, args.source_repo_path, args.release_notes_path)
+        repo_details, args.release_notes_path)
