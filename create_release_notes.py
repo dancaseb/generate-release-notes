@@ -122,6 +122,9 @@ class ReleaseNoteGenerator:
         self._prepend_release_note(
             release_notes_path, file_content, parsed_diff)
 
+    def open_env(self):
+        print(os.environ['REPO_URL'])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
@@ -137,3 +140,4 @@ if __name__ == "__main__":
     ReleaseNote = ReleaseNoteGenerator()
     ReleaseNote.generate(
         repo_details, args.release_notes_path)
+    ReleaseNote.open_env()
