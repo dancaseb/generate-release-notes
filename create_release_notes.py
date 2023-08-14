@@ -112,9 +112,9 @@ class ReleaseNoteGenerator:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
     parser.add_argument(
-        '--source_repo_path', type=str, help='Source repository path to generate release notes from.', required=True)
+        '--source_repo_path', type=str, help='Source repository path to generate release notes from', required=True)
     parser.add_argument('--release_notes_path', type=str,
-                        help='File name to write release notes to.', required=True)
+                        help='File name to write release notes to', required=True)
     args = parser.parse_args()
 
     Repo = GitRepo(args.source_repo_path)
