@@ -39,8 +39,8 @@ runs:
         repository: ${{inputs.docs-repo}}
     - name: Echo context
       run: |
-        echo "${{ toJson(github) }}"
-        echo "${{ toJson(env) }}"
+        echo '${{ toJson(github) }}'
+        echo '${{ toJson(env) }}'
       shell: bash
     - name: set up Python
       uses: actions/setup-python@v4
