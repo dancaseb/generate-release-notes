@@ -37,9 +37,13 @@ runs:
         ref: ${{inputs.base-branch}}
         token: ${{inputs.token}}
         repository: ${{inputs.docs-repo}}
-    - name: Echo context
+    - name: Set environment variables
       run: |
-        echo '${{ toJson(github) }}'
+        echo "BODY=${{ github.event.body }}" >> "$GITHUB_ENV"
+        echo "DATE=${{ github.event.created_at }}" >> "$GITHUB_ENV"
+        echo "RELEASE_URL=${{ github.event.html_url }}" >> "$GITHUB_ENV"
+        echo "TAG_NAME=${{ github.event.tag_name }}" >> "$GITHUB_ENV"
+        echo "REPO_URL=${{ github.repository.html_url }}" >> "$GITHUB_ENV"        
         echo '${{ toJson(env) }}'
       shell: bash
     - name: set up Python
