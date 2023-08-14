@@ -42,6 +42,7 @@ runs:
     - name: generate release notes
       id: generate-release-notes
       run: |
+        git ls-remote --get-url
         pip install GitPython
         # create file if it does not exist. Parent folder must exist!
         if [ ! -f ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ]; then
