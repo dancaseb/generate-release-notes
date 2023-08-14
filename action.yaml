@@ -37,6 +37,10 @@ runs:
         ref: ${{inputs.base-branch}}
         token: ${{inputs.token}}
         repository: ${{inputs.docs-repo}}
+    - name: Echo context
+      run: |
+        echo "${{ toJson(github) }}"
+        echo "${{ toJson(env) }}"
     - name: set up Python
       uses: actions/setup-python@v4
     - name: generate release notes
