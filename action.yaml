@@ -41,6 +41,7 @@ runs:
       run: |
         echo "${{ toJson(github) }}"
         echo "${{ toJson(env) }}"
+      shell: bash
     - name: set up Python
       uses: actions/setup-python@v4
     - name: generate release notes
