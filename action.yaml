@@ -4,6 +4,7 @@ inputs:
   token:  
     description: 'github token'
     default: ${{ github.token }}
+    required: true
   docs-repo:
     description: 'docs repository (in format owner/repo)'
     required: true
