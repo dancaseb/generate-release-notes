@@ -44,7 +44,7 @@ runs:
         echo "TAG_NAME=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
         echo "REPO_URL=${{ github.event.repository.html_url }}" >> "$GITHUB_ENV"
         echo "REPO_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
-        # echo "REPO_RELEASE_URL"=${{ github.event.release.html_url }}" >> "$GITHUB_ENV"
+        echo "REPO_RELEASE_URL=${{ github.event.release.html_url }}" >> "$GITHUB_ENV"
         # multiline string
         {
           echo 'CHANGELOG_BODY<<EOF'
