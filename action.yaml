@@ -46,7 +46,7 @@ runs:
         # multiline string
         {
           echo 'BODY<<EOF'
-          "Hello World"
+          echo "${{ github.event.release.body }}"
           echo EOF
         } >> "$GITHUB_ENV"
       shell: bash
