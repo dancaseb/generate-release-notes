@@ -45,7 +45,7 @@ runs:
         echo "REPO_URL=${{ github.event.repository.html_url }}" >> "$GITHUB_ENV"
         # multiline string
         echo 'BODY<<EOF' >> "$GITHUB_ENV"
-        "${{ github.event.release.body }}" >> "$GITHUB_ENV"
+        ${{ github.event.release.body }} >> "$GITHUB_ENV"
         echo 'EOF' >> "$GITHUB_ENV"
       shell: bash
     - name: set up Python
