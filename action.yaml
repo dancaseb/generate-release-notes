@@ -17,7 +17,7 @@ inputs:
     type: boolean
     default: false
   release-notes-path:
-    description: 'path to release notes file (including file name)'
+    description: 'path to release notes file'
     default: releases/release-notes.md
 runs:
   using: 'composite'
@@ -26,14 +26,14 @@ runs:
       run: |
         [[ "${{ inputs.docs-repo }}" ]] || { echo "docs-repo input is empty" ; exit 1; }
       shell: bash
-    - name: Checkout docs repo
+    - name: checkout docs repo
       uses: actions/checkout@v3
       with:
         path: ${{inputs.docs-repo}}
         ref: ${{inputs.base-branch}}
         token: ${{inputs.token}}
         repository: ${{inputs.docs-repo}}
-    - name: Set environment variables
+    - name: set environment variables
       run: |
         echo "RELEASE_DATE=${{ github.event.release.published_at }}" >> "$GITHUB_ENV"
         echo "RELEASE_URL=${{ github.event.release.html_url }}" >> "$GITHUB_ENV"

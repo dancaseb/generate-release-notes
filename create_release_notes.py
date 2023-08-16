@@ -10,8 +10,8 @@ class ReleaseNoteGenerator:
         # date format YYYY-MM-DDTHH:MM:SSZ
         parsed_changelog = {'release_url': os.environ['REPO_RELEASE_URL'],
                             'release_date': os.environ['RELEASE_DATE'].split('T')[0],
-                            'release_version': os.environ['TAG_NAME'], 'source_repo': os.environ['REPO_NAME'],
-                            'source_repo_url': os.environ['REPO_URL'], 'changes': []}
+                            'release_version': os.environ['TAG_NAME'], 'repo_name': os.environ['REPO_NAME'],
+                            'repo_url': os.environ['REPO_URL'], 'changes': []}
 
         changelog_lines = [
             line for line in os.environ['CHANGELOG_BODY'].splitlines() if line]
@@ -63,7 +63,7 @@ class ReleaseNoteGenerator:
         file.write(
             f"<!--Release note {parsed_changelog['release_version']}!-->\n")
         file.write(
-            f"### {parsed_changelog['release_date']} [{parsed_changelog['source_repo']}]({parsed_changelog['source_repo_url']})\n")
+            f"### {parsed_changelog['release_date']} [{parsed_changelog['repo_name']}]({parsed_changelog['repo_url']})\n")
         file.write(f"* #### {parsed_changelog['release_url']}\n\n")
         for change in parsed_changelog['changes']:
             file.write(f"#### {change['change_headline']}\n\n")
@@ -84,14 +84,13 @@ class ReleaseNoteGenerator:
     def generate(self):
         parsed_changelog = self._parse_changelog()
         self._verify_parsed_changelog(parsed_changelog)
-        # output REPO name and RELEASE version as env to be used later in workflow
+        # output repo_name and release_version as env to be used later in workflow
         self._output_env_variable(
-            'REPO_NAME_RELEASE', f"{parsed_changelog['source_repo']} {parsed_changelog['release_version']}")
-        print(f"parsed changelog: {parsed_changelog}")
+            'REPO_NAME_RELEASE', f"{parsed_changelog['repo_name']} {parsed_changelog['release_version']}")
 
         return parsed_changelog
 
-    def update_release_notes(self, parsed_changelog, release_notes_path):
+    def update_release_notes(self, release_notes_path, parsed_changelog):
         file_content = self._load_file(release_notes_path)
         self._prepend_release_note(
             release_notes_path, file_content, parsed_changelog)
@@ -100,9 +99,9 @@ class ReleaseNoteGenerator:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate release notes')
     parser.add_argument('--release_notes_path', type=str,
-                        help='File name to write release notes to', required=True)
+                        help='Path to release notes file', required=True)
     args = parser.parse_args()
 
     ReleaseNote = ReleaseNoteGenerator()
     parsed_changelog = ReleaseNote.generate()
-    ReleaseNote.update_release_notes(parsed_changelog, args.release_notes_path)
+    ReleaseNote.update_release_notes(args.release_notes_path, parsed_changelog)
