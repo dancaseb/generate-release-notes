@@ -44,7 +44,7 @@ runs:
         # echo "RELEASE_URL=${{ github.event.html_url }}" >> "$GITHUB_ENV"
         # echo "TAG_NAME=${{ github.event.tag_name }}" >> "$GITHUB_ENV"
         # echo "REPO_URL=${{ github.repository.html_url }}" >> "$GITHUB_ENV"
-        echo "BODY: ${{ github.event.body }}"
+        echo "BODY: ${{ toJSON(github.event.body) }}"
       shell: bash
     - name: set up Python
       uses: actions/setup-python@v4
