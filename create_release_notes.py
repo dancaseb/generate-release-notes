@@ -7,7 +7,8 @@ from patterns import *
 class ReleaseNoteGenerator:
 
     def _parse_changelog(self):
-        parsed_changelog = {'compare_changes_url': None, 'release_date': os.environ['RELEASE_DATE'],
+        # date format YYYY-MM-DDTHH:MM:SSZ
+        parsed_changelog = {'compare_changes_url': None, 'release_date': os.environ['RELEASE_DATE'].split('T')[0],
                             'release_version': os.environ['TAG_NAME'], 'source_repo': os.environ['REPO_NAME'],
                             'source_repo_url': os.environ['REPO_URL'], 'changes': []}
 
