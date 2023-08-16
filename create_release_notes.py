@@ -64,7 +64,8 @@ class ReleaseNoteGenerator:
             f"<!--Release note {parsed_changelog['release_version']}!-->\n")
         file.write(
             f"### {parsed_changelog['release_date']} [{parsed_changelog['repo_name']}]({parsed_changelog['repo_url']})\n")
-        file.write(f"* #### {parsed_changelog['release_url']}\n\n")
+        file.write(
+            f"* #### [{parsed_changelog['release_version']}]({parsed_changelog['release_url']})\n\n")
         for change in parsed_changelog['changes']:
             file.write(f"#### {change['change_headline']}\n\n")
             for commit in change['commits']:
