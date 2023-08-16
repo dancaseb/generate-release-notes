@@ -138,6 +138,6 @@ if __name__ == "__main__":
     repo_details = Repo.get_repo_details()
 
     ReleaseNote = ReleaseNoteGenerator()
-    ReleaseNote.generate(
-        repo_details, args.release_notes_path)
+    # ReleaseNote.generate(
+    #     repo_details, args.release_notes_path)
     ReleaseNote.open_env()
