@@ -39,23 +39,18 @@ runs:
         repository: ${{inputs.docs-repo}}
     - name: Set environment variables
       run: |
-        # echo "BODY=${{ github.event.body }}" >> "$GITHUB_ENV"
-        # echo "DATE=${{ github.event.created_at }}" >> "$GITHUB_ENV"
-        # echo "RELEASE_URL=${{ github.event.html_url }}" >> "$GITHUB_ENV"
-        # echo "TAG_NAME=${{ github.event.tag_name }}" >> "$GITHUB_ENV"
-        # echo "REPO_URL=${{ github.repository.html_url }}" >> "$GITHUB_ENV"
-        echo "BODY: ${{ github.event.release.body }}"
-        echo "DATE: ${{ github.event.release.created_at }}"
-        echo "RELEASE_URL: ${{ github.event.release.html_url }}"
-        echo "TAG_NAME: ${{ github.event.release.tag_name }}"
-        echo "REPO_URL: ${{ github.event.repository.html_url }}"
-        
+        echo "BODY: ${{ github.event.release.body }}" >> "$GITHUB_ENV"
+        echo "DATE: ${{ github.event.release.created_at }}" >> "$GITHUB_ENV"
+        echo "RELEASE_URL: ${{ github.event.release.html_url }}" >> "$GITHUB_ENV"
+        echo "TAG_NAME: ${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
+        echo "REPO_URL: ${{ github.event.repository.html_url }}">> "$GITHUB_ENV"
       shell: bash
     - name: set up Python
       uses: actions/setup-python@v4
     - name: generate release notes
       id: generate-release-notes
       run: |
+        echo "envs: ${{ env }}"
         git ls-remote --get-url
         pip install GitPython
         # create file if it does not exist. Parent folder must exist!
