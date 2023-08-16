@@ -63,8 +63,7 @@ class ReleaseNoteGenerator:
         file.write(
             f"<!--Release note {parsed_changelog['release_version']}!-->\n")
         file.write(
-            f"### {parsed_changelog['release_date']} [{parsed_changelog['source_repo']}]\
-            ({parsed_changelog['source_repo_url']})\n")
+            f"### {parsed_changelog['release_date']} [{parsed_changelog['source_repo']}]({parsed_changelog['source_repo_url']})\n")
         file.write(f"* #### {parsed_changelog['release_url']}\n\n")
         for change in parsed_changelog['changes']:
             file.write(f"#### {change['change_headline']}\n\n")
