@@ -39,13 +39,14 @@ runs:
         repository: ${{inputs.docs-repo}}
     - name: Set environment variables
       run: |
-        echo "DATE=${{ github.event.release.created_at }}" >> "$GITHUB_ENV"
+        echo "RELEASE_DATE=${{ github.event.release.created_at }}" >> "$GITHUB_ENV"
         echo "RELEASE_URL=${{ github.event.release.html_url }}" >> "$GITHUB_ENV"
         echo "TAG_NAME=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
         echo "REPO_URL=${{ github.event.repository.html_url }}" >> "$GITHUB_ENV"
+        echo "REPO_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
         # multiline string
         {
-          echo 'BODY<<EOF'
+          echo 'CHANGELOG_BODY<<EOF'
           echo "${{ github.event.release.body }}"
           echo EOF
         } >> "$GITHUB_ENV"
@@ -55,7 +56,6 @@ runs:
     - name: generate release notes
       id: generate-release-notes
       run: |
-        pip install GitPython
         # create file if it does not exist. Parent folder must exist!
         if [ ! -f ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ]; then
           echo "release-notes file does not exist. Creating empty file now..."

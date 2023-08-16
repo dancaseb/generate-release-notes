@@ -5,62 +5,32 @@ import argparse
 from patterns import *
 
 
-class GitRepo:
-    def __init__(self, path):
-        # path to the git repo
-        self.repo = git.Repo(path)
-
-    def _get_changelog_diff(self):
-        diff = self.repo.git.diff(
-            "--unified=0", "HEAD^", "HEAD", "--", "CHANGELOG.md")
-        if not diff:
-            raise Exception(
-                "git diff --unified=0 HEAD^ HEAD -- CHANGELOG.md returned empty string. \
-                    There is nothing to generate the release note from!")
-        return diff
-
-    def _get_repo_url(self):
-        return self.repo.git.ls_remote("--get-url")
-
-    def _get_latest_tag(self):
-        version = self.repo.git.for_each_ref(
-            "--sort=-v:refname", "--format=%(refname:short)", "--count=1", "refs/tags/v*")
-        date = self.repo.git.for_each_ref(
-            "--sort=-v:refname", "--format=%(authordate:short)", "--count=1", "refs/tags/v*")
-        return {'version': version, 'date': date}
-
-    def get_repo_details(self):
-        return {'changelog_diff': self._get_changelog_diff(), 'url': self._get_repo_url(),
-                'latest_tag': self._get_latest_tag(),
-                'name': self.repo.remotes.origin.url.split('/')[-1].removesuffix('.git')}
-
-
 class ReleaseNoteGenerator:
 
-    def _parse_diff(self, repo):
-        parsed_diff = {'compare_changes_url': None, 'release_date': repo['latest_tag']['date'],
-                       'release_version': repo['latest_tag']['version'], 'source_repo': repo['name'],
-                       'source_repo_url': repo['url'], 'changes': []}
+    def _parse_changelog(self):
+        parsed_changelog = {'compare_changes_url': None, 'release_date': os.environ['RELEASE_DATE'],
+                            'release_version': os.environ['TAG_NAME'], 'source_repo': os.environ['REPO_NAME'],
+                            'source_repo_url': os.environ['REPO_URL'], 'changes': []}
 
-        changelog_lines = re.findall(
-            extract_changes_pattern, repo['changelog_diff'], re.M)
+        changelog_lines = [
+            line for line in os.environ['CHANGELOG_BODY'].splitlines() if line]
         for line in changelog_lines:
             if re.match(version_headline_pattern, line):
-                parsed_diff['compare_changes_url'] = re.search(
+                parsed_changelog['compare_changes_url'] = re.search(
                     version_headline_pattern, line).group(1)
             # e.g., ### Bug Fixes
             elif line.startswith(change_headline_start):
-                parsed_diff['changes'].append(
+                parsed_changelog['changes'].append(
                     {'change_headline': line.replace(change_headline_start, '', 1)})
-                # the changes are grouped under the headline, so we will be modifying the last change headline group
-                parsed_diff['changes'][-1]['details'] = []
+                # the changes are grouped under the headline, we will be modifying the last change headline group
+                parsed_changelog['changes'][-1]['details'] = []
             # commit messages
             elif line.startswith(commit_message_start):
                 commit_message = line.replace(commit_message_start, '', 1)
                 commit_hash = re.search(commit_pattern, line).group(1)
-                parsed_diff['changes'][-1]['details'].append(
+                parsed_changelog['changes'][-1]['details'].append(
                     {'commit_message': commit_message, 'commit_hash': commit_hash})
-        return parsed_diff
+        return parsed_changelog
 
     def _load_file(self, path):
         with open(path, 'r') as file:
@@ -112,22 +82,16 @@ class ReleaseNoteGenerator:
         with open(os.environ['GITHUB_OUTPUT'], 'a') as output_file:
             print(f'{name}={value}', file=output_file)
 
-    def generate(self, repo_details, release_notes_path):
-        parsed_diff = self._parse_diff(repo_details)
+    def generate(self, release_notes_path):
+        parsed_diff = self._parse_changelog()
         self._verify_parsed_diff(parsed_diff)
         # output REPO name and RELEASE version as env to be used later in workflow
         self._output_env_variable(
             'REPO_RELEASE', f"{parsed_diff['source_repo']} {parsed_diff['release_version']}")
+        print(f"parsed diff: {parsed_diff}")
         file_content = self._load_file(release_notes_path)
         self._prepend_release_note(
             release_notes_path, file_content, parsed_diff)
-
-    def open_env(self):
-        print(f"repo url {os.environ['REPO_URL']}")
-        print(f"body {os.environ['BODY']}")
-        print(f"TAG_NAME {os.environ['TAG_NAME']}")
-        print(f"DATE {os.environ['DATE']}")
-        print(f"RELEASE_URL {os.environ['RELEASE_URL']}")
 
 
 if __name__ == "__main__":
@@ -138,10 +102,5 @@ if __name__ == "__main__":
                         help='File name to write release notes to', required=True)
     args = parser.parse_args()
 
-    Repo = GitRepo(args.source_repo_path)
-    repo_details = Repo.get_repo_details()
-
     ReleaseNote = ReleaseNoteGenerator()
-    # ReleaseNote.generate(
-    #     repo_details, args.release_notes_path)
-    ReleaseNote.open_env()
+    ReleaseNote.generate(args.release_notes_path)
