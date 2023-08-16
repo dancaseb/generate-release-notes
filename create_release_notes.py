@@ -124,6 +124,10 @@ class ReleaseNoteGenerator:
 
     def open_env(self):
         print(f"repo url {os.environ['REPO_URL']}")
+        print(f"body {os.environ['BODY']}")
+        print(f"TAG_NAME {os.environ['TAG_NAME']}")
+        print(f"DATE {os.environ['DATE']}")
+        print(f"RELEASE_URL {os.environ['RELEASE_URL']}")
 
 
 if __name__ == "__main__":
