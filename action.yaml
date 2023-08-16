@@ -46,7 +46,7 @@ runs:
         # multiline string
         {
           echo 'BODY<<EOF'
-          ${{ github.event.release.body }}
+          "${{ github.event.release.body }}"
           echo EOF
         } >> "$GITHUB_ENV"
       shell: bash
@@ -55,7 +55,8 @@ runs:
     - name: generate release notes
       id: generate-release-notes
       run: |
-        echo "envs are ${{ env }}"
+        echo "BODY" >> index.md
+        cat index.md
         pip install GitPython
         # create file if it does not exist. Parent folder must exist!
         if [ ! -f ${{inputs.docs-repo}}/${{inputs.release-notes-path}} ]; then
