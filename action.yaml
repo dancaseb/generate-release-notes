@@ -72,6 +72,7 @@ runs:
         title: '[Auto PR] Updated release notes ${{ steps.generate-release-notes.outputs.REPO_NAME_RELEASE }}'
         delete-branch: true
         base: ${{inputs.base-branch}}
+        body: Automated changes by [generate-release-notes](https://github.com/indykite/generate-release-notes) GitHub action
     - name: allow auto merge
       if: ${{inputs.allow-automerge == 'true'}}
       env:
