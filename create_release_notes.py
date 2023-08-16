@@ -1,4 +1,3 @@
-import git
 import re
 import os
 import argparse
