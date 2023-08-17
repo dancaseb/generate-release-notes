@@ -2,14 +2,14 @@ import re
 import os
 import argparse
 from patterns import *
+from datetime import datetime
 
 
 class ReleaseNoteGenerator:
 
     def _parse_changelog(self):
-        # date format YYYY-MM-DDTHH:MM:SSZ
         parsed_changelog = {'release_url': os.environ['REPO_RELEASE_URL'],
-                            'release_date': os.environ['RELEASE_DATE'].split('T')[0],
+                            'release_date': self._format_date(os.environ['RELEASE_DATE']),
                             'release_version': os.environ['TAG_NAME'], 'repo_name': os.environ['REPO_NAME'],
                             'repo_url': os.environ['REPO_URL'], 'changes': []}
 
@@ -29,6 +29,12 @@ class ReleaseNoteGenerator:
                 parsed_changelog['changes'][-1]['commits'].append(
                     {'message': commit_message, 'hash': commit_hash})
         return parsed_changelog
+
+    def _format_date(self, input_date):
+        output_date = datetime.strptime(
+            input_date, github_date_format).strftime(output_date_format)
+
+        return output_date
 
     def _load_file(self, path):
         with open(path, 'r') as file:

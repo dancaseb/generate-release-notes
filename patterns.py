@@ -12,3 +12,7 @@ change_headline_start = '### '
 # RELEASE NOTE PATTERNS
 file_headline = '# Changelog'
 section_delimeter = '***'
+
+# DATE FORMATS
+github_date_format = '%Y-%m-%dT%H:%M:%SZ'
+output_date_format = '%d %B %Y'
