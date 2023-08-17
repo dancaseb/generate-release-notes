@@ -3,8 +3,8 @@ description: 'Action used to generate release notes and create PR in the docs re
 inputs:
   token:  
     description: 'GitHub token used for checkout and creating PR'
-    default: ${{ github.token }}
     required: true
+    default: ${{ github.token }}
   docs-repo:
     description: 'docs repository (in format owner/repo)'
     required: true
