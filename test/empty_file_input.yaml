@@ -1,0 +1,18 @@
+REPO_RELEASE_URL: https://example.com/example-repo/releases/v1.0.0
+RELEASE_DATE: '2023-08-14T13:12:36Z'
+TAG_NAME: v0.18.2
+REPO_NAME: example-repo
+REPO_URL: https://example.com/example-repo
+CHANGELOG_BODY: |
+  ## [0.18.0](https://github.com/indykite/test-ik-jira/compare/v0.17.0...v0.18.0) (2023-08-14)
+
+
+  ### Features
+
+  * some feature ([c708a69](https://github.com/indykite/test-ik-jira/commit/c708a6942f90b33f5d31536c483f0692841c4acc))
+
+
+  ### Bug Fixes
+
+  * another fix, later ([ea7d571](https://github.com/indykite/test-ik-jira/commit/ea7d57144d2b51d27e0c153db61b71fd78cc95f2))
+  * fix ([7cc037e](https://github.com/indykite/test-ik-jira/commit/7cc037e47972e83f3cd140ac64bc9b84c8c718c6))
