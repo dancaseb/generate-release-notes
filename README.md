@@ -8,7 +8,7 @@ Automated generation of release notes for GitHub repositories. Release note is g
 1. Create a `.github/workflows/generate-release-notes.yaml` file with these contents:
 
     ```yaml
-    name: generate-release-notes
+    name: Generate release notes
     on:
       release:
         types:
@@ -18,7 +18,7 @@ Automated generation of release notes for GitHub repositories. Release note is g
       generate-release-notes:
         runs-on: ubuntu-latest
         steps:
-          - uses: indykite/generate-release-notes
+          - uses: indykite/generate-release-notes@v1
             with:
               docs-repo: owner/docs-repo
     ```
