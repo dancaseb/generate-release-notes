@@ -8,6 +8,14 @@ import shutil
 
 
 class TestReleaseNotesGenereator(unittest.TestCase):
+    """
+    Test cases for ReleaseNoteGenerator. Run using
+        python3 -m unittest test_create_release_notes.py
+    Tests: 
+    1. Release notes are empty file
+    2. Release notes are non-empty file
+    3. Changelog has different headline format
+    """
 
     def load_data(self, input):
         self.maxDiff = None
