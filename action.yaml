@@ -2,18 +2,18 @@ name: 'Generate release notes'
 description: 'Action used to generate release notes and create PR in the docs repo'
 inputs:
   token:  
-    description: 'github token'
+    description: 'GitHub token used for checkout and creating PR'
     default: ${{ github.token }}
     required: true
   docs-repo:
     description: 'docs repository (in format owner/repo)'
     required: true
   base-branch:
-    description: 'branch to create PR against'
+    description: 'branch to create PR against in docs repo'
     required: true
     default: master
   allow-automerge:
-    description: 'allow automatic merge of PR'
+    description: 'allow automatic merge of PR in docs repo'
     type: boolean
     default: false
   release-notes-path:
@@ -62,7 +62,7 @@ runs:
         python ${{github.action_path}}/create_release_notes.py \
         --release_notes_path ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
       shell: bash
-    - name: create PR
+    - name: create PR in docs repo
       uses: peter-evans/create-pull-request@v5
       with:
         token: ${{inputs.token}}
@@ -73,7 +73,7 @@ runs:
         delete-branch: true
         base: ${{inputs.base-branch}}
         body: Automated changes by [generate-release-notes](https://github.com/indykite/generate-release-notes) GitHub action
-    - name: allow auto merge
+    - name: allow auto merge of PR
       if: ${{inputs.allow-automerge == 'true'}}
       env:
         GH_TOKEN: ${{inputs.token}}
