@@ -4,7 +4,7 @@ TAG_NAME: v0.18.2
 REPO_NAME: example-repo
 REPO_URL: https://example.com/example-repo
 CHANGELOG_BODY: |
-  ### [0.18.0](https://github.com/indykite/test-ik-jira/compare/v0.18.1...v0.18.2) (2023-08-14)
+  ### [0.18.2](https://github.com/indykite/test-ik-jira/compare/v0.18.1...v0.18.2) (2023-08-14)
 
 
   ### Features
