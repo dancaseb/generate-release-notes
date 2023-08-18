@@ -24,8 +24,8 @@ class TestReleaseNotesGenereator(unittest.TestCase):
             self.input_data = yaml.load(input_file, Loader=yaml.FullLoader)
         for key, value in self.input_data.items():
             os.environ[key] = value
-        self.tmpfile = tempfile.NamedTemporaryFile()
-        os.environ['GITHUB_OUTPUT'] = self.tmpfile.name
+        self.github_output_tmp_file = tempfile.mkstemp()[1]
+        os.environ['GITHUB_OUTPUT'] = self.github_output_tmp_file
 
         with open("test/" + input + "_validate.yaml") as validate_file:
             self.validate_data = yaml.load(
@@ -36,7 +36,7 @@ class TestReleaseNotesGenereator(unittest.TestCase):
         self.release_notes_validate_path = f"test/{input}_release_notes_validate.md"
 
     def clean_up(self):
-        self.tmpfile.close()
+        os.remove(self.github_output_tmp_file)
         os.remove(self.release_notes_path)
 
     def generate_release_note(self):
@@ -49,7 +49,7 @@ class TestReleaseNotesGenereator(unittest.TestCase):
                                             'repo_name': self.input_data['REPO_NAME'],
                                             'repo_url': self.input_data['REPO_URL'],
                                             'changes': self.validate_data['CHANGES']})
-        with open(self.tmpfile.name) as f:
+        with open(self.github_output_tmp_file) as f:
             self.assertEqual(
                 f.read(), f"REPO_NAME_RELEASE={self.input_data['REPO_NAME']} {self.input_data['TAG_NAME']}\n")
 
