@@ -1,0 +1,84 @@
+name: 'Generate release notes'
+description: 'Action used to generate release notes and create PR in the docs repo'
+inputs:
+  token:  
+    description: 'GitHub token used for checkout and creating PR'
+    required: true
+    default: ${{ github.token }}
+  docs-repo:
+    description: 'docs repository (in format owner/repo)'
+    required: true
+  base-branch:
+    description: 'branch to create PR against in docs repo'
+    required: true
+    default: master
+  allow-automerge:
+    description: 'allow automatic merge of PR in docs repo'
+    type: boolean
+    default: false
+  release-notes-path:
+    description: 'path to release notes file'
+    default: releases/release-notes.md
+runs:
+  using: 'composite'
+  steps:
+    - name: validate required inputs
+      run: |
+        [[ "${{ inputs.docs-repo }}" ]] || { echo "docs-repo input is empty" ; exit 1; }
+        [[ "${{ github.event.action }}" == "published" ]] || { echo "Action was not run after release was published. \
+        Please, run this action on published release." ; exit 1; }
+      shell: bash
+    - name: checkout docs repo
+      uses: actions/checkout@v3
+      with:
+        path: ${{inputs.docs-repo}}
+        ref: ${{inputs.base-branch}}
+        token: ${{inputs.token}}
+        repository: ${{inputs.docs-repo}}
+    - name: set environment variables
+      run: |
+        echo "RELEASE_DATE=${{ github.event.release.published_at }}" >> "$GITHUB_ENV"
+        echo "RELEASE_URL=${{ github.event.release.html_url }}" >> "$GITHUB_ENV"
+        echo "TAG_NAME=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
+        echo "REPO_URL=${{ github.event.repository.html_url }}" >> "$GITHUB_ENV"
+        echo "REPO_NAME=${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+        echo "REPO_RELEASE_URL=${{ github.event.release.html_url }}" >> "$GITHUB_ENV"
+        # multiline string
+        {
+          echo 'CHANGELOG_BODY<<EOF'
+          echo "${{ github.event.release.body }}"
+          echo EOF
+        } >> "$GITHUB_ENV"
+      shell: bash
+    - name: set up Python
+      uses: actions/setup-python@v4
+    - name: generate release notes
+      id: generate-release-notes
+      run: |
+        # create file if it does not exist. Parent folder must exist!
+        if [ ! -f ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}} ]; then
+          echo "release-notes file does not exist. Creating empty file now..."
+          touch ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
+        fi
+        # run script to generate release notes
+        python ${{github.action_path}}/create_release_notes.py \
+        --release_notes_path ${{github.workspace}}/${{inputs.docs-repo}}/${{inputs.release-notes-path}}
+      shell: bash
+    - name: create PR in docs repo
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{inputs.token}}
+        path: ${{inputs.docs-repo}}
+        commit-message: 'release note ${{ steps.generate-release-notes.outputs.REPO_NAME_RELEASE }}'
+        branch: new-release-notes/preview
+        title: '[Auto PR] Updated release notes ${{ steps.generate-release-notes.outputs.REPO_NAME_RELEASE }}'
+        delete-branch: true
+        base: ${{inputs.base-branch}}
+        body: Automated changes by [generate-release-notes](https://github.com/indykite/generate-release-notes) GitHub action
+    - name: allow auto merge of PR
+      if: ${{inputs.allow-automerge == 'true'}}
+      env:
+        GH_TOKEN: ${{inputs.token}}
+      run: |
+        gh pr merge new-release-notes/preview --auto --delete-branch --rebase --repo ${{inputs.docs-repo}}
+      shell: bash
