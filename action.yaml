@@ -25,7 +25,7 @@ runs:
     - name: validate required inputs
       run: |
         [[ "${{ inputs.docs-repo }}" ]] || { echo "docs-repo input is empty" ; exit 1; }
-        [[ "${{ github.event.action }}" != "published" ]] || { echo "Action was not run after release was published. \
+        [[ "${{ github.event.action }}" == "published" ]] || { echo "Action was not run after release was published. \
         Please, run this action on published release." ; exit 1; }
       shell: bash
     - name: checkout docs repo
