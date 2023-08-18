@@ -13,4 +13,5 @@ jobs:
         uses: actions/setup-python@v4
       - name: Run unit tests
         run: |
+          ls
           python -m unittest
