@@ -2,8 +2,7 @@ name: Unit tests
 on:
   push:
     branches:
-      - master
-      - generate-relase-notes
+      - unittest
 
 jobs:
   run-unit-tests:
@@ -14,4 +13,4 @@ jobs:
         uses: actions/setup-python@v4
       - name: Run unit tests
         run: |
-          python3 -m unittest test_create_release_notes.py
+          python -m unittest test_create_release_notes.py
