@@ -1,0 +1,17 @@
+name: Unit tests
+on:
+  push:
+    branches:
+      - master
+      - generate-relase-notes
+
+jobs:
+  run-unit-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest   
+    steps:
+      - name: setup Python
+        uses: actions/setup-python@v4
+      - name: Run unit tests
+        run: |
+          python3 -m unittest test_create_release_notes.py
