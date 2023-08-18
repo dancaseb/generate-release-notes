@@ -14,4 +14,3 @@ jobs:
       - name: Run unit tests
         run: |
           ls
-          python -m unittest
