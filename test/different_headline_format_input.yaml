@@ -1,10 +1,10 @@
-REPO_RELEASE_URL: https://example.com/example-repo/releases/v1.0.0
+REPO_RELEASE_URL: https://example.com/example-repo/releases/v0.18.2
 RELEASE_DATE: '2023-08-14T13:12:36Z'
 TAG_NAME: v0.18.2
 REPO_NAME: example-repo
 REPO_URL: https://example.com/example-repo
 CHANGELOG_BODY: |
-  ### [0.18.0](https://github.com/indykite/test-ik-jira/compare/v0.17.0...v0.18.0) (2023-08-14)
+  ### [0.18.0](https://github.com/indykite/test-ik-jira/compare/v0.18.1...v0.18.2) (2023-08-14)
 
 
   ### Features

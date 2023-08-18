@@ -32,12 +32,12 @@ class TestReleaseNotesGenereator(unittest.TestCase):
                 validate_file, Loader=yaml.FullLoader)
         shutil.copyfile(f"test/{input}_release_notes.md",
                         f"test/{input}_release_notes_copy.md")
-        self.validate_data['RELEASE_NOTES_PATH'] = f"test/{input}_release_notes_copy.md"
-        self.validate_data['RELEASE_NOTES_VALIDATE_PATH'] = f"test/{input}_release_notes_validate.md"
+        self.release_notes_path = f"test/{input}_release_notes_copy.md"
+        self.release_notes_validate_path = f"test/{input}_release_notes_validate.md"
 
     def clean_up(self):
         self.tmpfile.close()
-        os.remove(self.validate_data['RELEASE_NOTES_PATH'])
+        os.remove(self.release_notes_path)
 
     def generate_release_note(self):
         self.ReleaseNote = ReleaseNoteGenerator()
@@ -54,9 +54,9 @@ class TestReleaseNotesGenereator(unittest.TestCase):
                 f.read(), f"REPO_NAME_RELEASE={self.input_data['REPO_NAME']} {self.input_data['TAG_NAME']}\n")
 
         self.ReleaseNote.update_release_notes(
-            self.validate_data['RELEASE_NOTES_PATH'], parsed_changelog)
-        self.assertEqual(True, filecmp.cmp(self.validate_data['RELEASE_NOTES_PATH'],
-                                           self.validate_data['RELEASE_NOTES_VALIDATE_PATH']))
+            self.release_notes_path, parsed_changelog)
+        self.assertEqual(True, filecmp.cmp(self.release_notes_path,
+                                           self.release_notes_validate_path))
 
     def test_generate_release_note(self):
         test_cases = ['empty_file', 'non_empty_file',

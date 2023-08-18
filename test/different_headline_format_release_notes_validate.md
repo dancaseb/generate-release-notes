@@ -3,7 +3,7 @@
 ***
 <!--Release note v0.18.2!-->
 ### 14 August 2023 [example-repo](https://example.com/example-repo)
-* #### [v0.18.2](https://example.com/example-repo/releases/v1.0.0)
+* #### [v0.18.2](https://example.com/example-repo/releases/v0.18.2)
 
 #### Features
 

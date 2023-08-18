@@ -10,5 +10,3 @@ CHANGES:
       - message: fix ([7cc037e](https://github.com/indykite/test-ik-jira/commit/7cc037e47972e83f3cd140ac64bc9b84c8c718c6))
         hash: 7cc037e47972e83f3cd140ac64bc9b84c8c718c6
 RELEASE_DATE_FORMATTED: '14 August 2023'
-RELEASE_NOTES_PATH: test/non_empty_release_notes.md
-RELEASE_NOTES_VALIDATE_PATH: test/non_empty_release_notes_validate.md
